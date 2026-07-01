@@ -83,7 +83,15 @@ autoreload_parse_sources() {
 # directory of each entry. Watching the directory plus the basename catches the
 # rename-on-save dance most editors use.
 autoreload_watch_dirs() {
-  awk 'NF{ p=$0; sub(/\/[^/]*$/,"",p); if(p=="") p="/"; if(!seen[p]++) print p }'
+  local line parent seen=""
+  while IFS= read -r line; do
+    [[ -n "${line}" ]] || continue
+    parent="${line%/*}"
+    [[ "${parent}" == "${line}" ]] || [[ -n "${parent}" ]] || parent="/"
+    case " ${seen} " in *" ${parent} "*) continue ;; esac
+    seen="${seen} ${parent}"
+    printf '%s\n' "${parent}"
+  done
 }
 
 # autoreload_diff_files OLD NEW -> print every file in NEW whose mtime differs

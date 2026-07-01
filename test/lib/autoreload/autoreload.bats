@@ -88,3 +88,8 @@ teardown() {
   [[ "$(autoreload_backoff_delay 2 9 30)" == "30" ]]
   [[ "$(autoreload_backoff_delay x y z)" == "2" ]]
 }
+
+@test "autoreload_watch_dirs maps a top-level file to root" {
+  run autoreload_watch_dirs <<< "$(printf '%s\n' /x.conf)"
+  [[ "${output}" == "/" ]]
+}
